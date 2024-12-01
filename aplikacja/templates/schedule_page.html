@@ -1,0 +1,85 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarządzanie irygacją trawnika</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+</head>
+
+<body>
+    {% include 'header.html' %}
+    
+    <main>
+      <h1>Harmonogram podlewania</h1>
+      <p>Dodaj lub edytuj harmonogram podlewania swojego trawnika.</p>
+      
+      <div id='calendar'></div>  <div class="schedule-form">
+        <h2>Dodaj podlewanie</h2>
+        <form method="post" action="/schedule/">
+            {% csrf_token %}
+            <label for="date">Data:</label>
+            <input type="date" id="date" name="date" required>
+            
+            <label for="time">Godzina:</label>
+            <input type="time" id="time" name="time" required>   
+  
+            
+            <label for="duration">Czas trwania (minuty):</label>
+            <input type="number" id="duration" name="duration" min="1" required>
+
+            <label for="recurrence_interval">Cykliczność (dni):</label>
+            <select name="recurrence_interval">
+                <option value="0">Jednorazowe wydarzenie</option>
+                <option value="1">Co 1 dzień</option>
+                <option value="2">Co 2 dni</option>
+                <option value="3">Co 3 dni</option>
+                <option value="5">Co 5 dni</option>
+                <option value="7">Co tydzień</option>
+            </select>
+            
+            <button type="submit" class="button">Dodaj</button>
+        </form>
+
+        <form method="post" action="{% url 'delete_events' %}">
+          {% csrf_token %}
+          <label for="date_to_delete">Daty do usunięcia:</label>
+          <input type="date" id="date_to_delete" name="date_to_delete" required>
+          <label for="recurrence_interval">Cykliczność (dni):</label>
+            <select name="recurrence_interval">
+                <option value="0">Jednorazowe wydarzenie</option>
+                <option value="1">Co 1 dzień</option>
+                <option value="2">Co 2 dni</option>
+                <option value="3">Co 3 dni</option>
+                <option value="5">Co 5 dni</option>
+                <option value="7">Co tydzień</option>
+            </select>
+          <button type="submit">Usuń wydarzenia</button>
+      </form>
+      </div>
+    </main>
+  
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+  
+    <script>
+        document.addEventListener('DOMContentLoaded', function()   
+   {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',   
+  
+                locale: 'pl',
+                events: {{ events|safe }} // Przekaż dane z widoku
+            });
+            calendar.render();
+        });
+    </script>
+  </body>
+  
+  </html>

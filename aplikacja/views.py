@@ -1,0 +1,71 @@
+from django.shortcuts import render, redirect
+from . import models
+from django.utils.dateparse import parse_datetime
+from django.contrib import admin
+import datetime
+
+def test_view(request):
+    return render(request, 'test_page.html', {'message': 'To jest przykładowa strona testowa!'})
+
+def home_view(request):
+    return render(request, 'home_page.html')
+
+def delete_events(request):
+    if request.method == 'POST':
+        date_to_delete = request.POST.get('date_to_delete')
+        cycle = int(request.POST.get('recurrence_interval'))
+        date_to_delete = datetime.datetime.strptime(date_to_delete, '%Y-%m-%d').date()
+
+        end_of_cycle = date_to_delete.replace(year=date_to_delete.year+1, month=date_to_delete.month, day=date_to_delete.day)
+
+        if cycle > 0:  # Create recurring events if cycle is greater than 0
+            while date_to_delete < end_of_cycle:
+                models.ScheduleEvent.objects.filter(start__date=date_to_delete).delete()
+                date_to_delete += datetime.timedelta(days=cycle)
+        else:
+            models.ScheduleEvent.objects.filter(start__date=date_to_delete).delete()
+    return redirect('schedule')  # Redirect to the schedule page
+
+
+def schedule_view(request):
+    if request.method == 'POST':
+        # Pobierz dane z formularza
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        cycle = int(request.POST.get('recurrence_interval'))
+        duration = int(request.POST.get('duration'))
+
+        # Przelicz czas rozpoczęcia i zakończenia
+        start = datetime.datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
+        end = start + datetime.timedelta(minutes=duration)
+
+        end_of_cycle = start.replace(year=start.year+1, month=start.month, day=start.day)
+
+
+        # Zapisz wydarzenie w bazie danych
+        if cycle > 0:  # Create recurring events if cycle is greater than 0
+            while start < end_of_cycle:
+                models.ScheduleEvent.objects.create(start=start, end=end)
+                start += datetime.timedelta(days=cycle)
+                end = start + datetime.timedelta(minutes=duration)
+        else:  # Create a single event if cycle is 0
+            models.ScheduleEvent.objects.create(start=start, end=end)
+            
+        # Przekieruj na tę samą stronę, by odświeżyć widok
+        return redirect('schedule')
+
+    events = models.ScheduleEvent.objects.all()
+    events_json = [{
+    'title': event.title,
+    'start': event.start.isoformat(),
+    'end': event.end.isoformat()
+    } for event in events]
+
+    return render(request, 'schedule_page.html', {'events': events_json})
+
+
+def weather_view(request):
+    return render(request, 'weather_page.html')
+
+def sensor_view(request):
+    return render(request, 'sensor_page.html')

@@ -1,0 +1,40 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarządzanie irygacją trawnika</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body>
+    {% include 'header.html' %}
+
+    <main>
+        <h1>Witaj w aplikacji zarządzania irygacją trawnika!</h1>
+        <p>Automatyzuj podlewanie swojego trawnika dzięki naszemu systemowi.</p>
+
+        <section class="features">
+            <div class="feature">
+                <h2>Harmonogram podlewania</h2>
+                <p>Ustaw plan na podstawie swojego kalendarza, który automatycznie dostosuje się do pogody.</p>
+                <a href="/schedule/" class="button">Zarządzaj harmonogramem</a>
+            </div>
+            <div class="feature">
+                <h2>Dane pogodowe</h2>
+                <p>Sprawdź aktualne prognozy i zobacz jak zużycie wody dostosowuje się warunków atmosferycznych</p>
+                <a href="/weather/" class="button">Sprawdź pogodę</a>
+            </div>
+            <div class="feature">
+                <h2>Status wilgotności</h2>
+                <p>Monitoruj temperaturę, wilgotność oraz stan gleby i upewnij się, że Twój trawnik jest zawsze zdrowy</p>
+                <a href="/sensor/" class="button">Odczyt z czujników</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
