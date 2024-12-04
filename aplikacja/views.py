@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from . import models
 from django.utils.dateparse import parse_datetime
 from django.contrib import admin
+import requests
+from django.conf import settings
 import datetime
 
 def test_view(request):
@@ -63,9 +65,43 @@ def schedule_view(request):
 
     return render(request, 'schedule_page.html', {'events': events_json})
 
+# Funkcja do pobierania danych o pogodzie
+def get_weather_data(city):
+    # Użyj swojego klucza API, który otrzymałeś z OpenWeatherMap
+    api_key = settings.OPENWEATHER_API_KEY
+    base_url = "http://api.openweathermap.org/data/2.5/weather?"
+    
+    # Tworzenie pełnego URL z nazwą miasta i kluczem API
+    url = f"{base_url}q={city}&appid={api_key}&units=metric&lang=pl"
+
+    # Wykonaj zapytanie GET do API
+    response = requests.get(url)
+    
+    # Jeśli odpowiedź jest poprawna (status 200)
+    if response.status_code == 200:
+        data = response.json()
+        
+        # Wydobywanie interesujących danych z odpowiedzi
+        weather = {
+            'city': data['name'],
+            'temperature': data['main']['temp'],
+            'description': data['weather'][0]['description'],
+            'humidity': data['main']['humidity'],
+            'wind_speed': data['wind']['speed'],
+            'rain': data.get('rain', {}).get('1h', 0)
+        }
+        
+        return weather
+    else:
+        # Jeśli wystąpił błąd (np. złe miasto)
+        return None
+
 
 def weather_view(request):
-    return render(request, 'weather_page.html')
+    city = 'Poznan'
+    weather_data = get_weather_data(city)
+    
+    return render(request, 'weather_page.html', {'weather': weather_data})
 
 def sensor_view(request):
     return render(request, 'sensor_page.html')
