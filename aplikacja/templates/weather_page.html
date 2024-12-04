@@ -14,7 +14,39 @@
 <body>
     {% include 'header.html' %}
     <main>
-        
+        <h1>Prognoza pogody dla {{ weather.city }}</h1>
+        <div class="weather-container">
+            {% if weather %}
+                <table>
+                    <tr>
+                        <th>Parametr</th>
+                        <th>Wartość</th>
+                    </tr>
+                    <tr>
+                        <td>Temperatura</td>
+                        <td>{{ weather.temperature }} °C</td>
+                    </tr>
+                    <tr>
+                        <td>Opis</td>
+                        <td>{{ weather.description | title }}</td>
+                    </tr>
+                    <tr>
+                        <td>Wilgotność</td>
+                        <td>{{ weather.humidity }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Prędkość wiatru</td>
+                        <td>{{ weather.wind_speed }} m/s</td>
+                    </tr>
+                    <tr>
+                        <td>Opady</td>
+                        <td>{{ weather.rain }} mm/h</td>
+                    </tr>
+                </table>
+            {% else %}
+                <p class="weather-info">Nie udało się pobrać danych o pogodzie. Spróbuj później.</p>
+            {% endif %}
+        </div>
     </main>
 </body>
 </html>

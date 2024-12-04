@@ -155,3 +155,36 @@ nav a:hover {
     border-radius: 4px;
     font-size: 16px;
   }
+
+/* Sekcja pogody */
+.weather-container table {
+    width: 80%; /* Dostosuj szerokość tabeli */
+    margin: 0 auto; /* Wyśrodkowanie tabeli */
+    border-collapse: collapse;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.weather-container th, .weather-container td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.weather-container th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.weather-container tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.weather-container tr:hover {
+    background-color: #e6f7ff;
+}
+  
+  /* Formularz kalendarza (Usuwanie zbędnych stylów) */
+  #calendar, .schedule-form { /* Remove unused styles */
+    display: none;
+  }
