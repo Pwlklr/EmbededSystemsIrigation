@@ -1,0 +1,9 @@
+{
+    "pump_efficiency": 10.0,
+    "city": "Warszawa",
+    "watering_duration": 15,
+    "min_rain": 2.0,
+    "disable_on_rain": true,
+    "max_temp": 30.0,
+    "OPENWEATHER_API_KEY": "0997b2b7c7c9e26d36342fae2dd463a8"
+}

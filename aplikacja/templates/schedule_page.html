@@ -10,7 +10,7 @@
     <title>Zarządzanie irygacją trawnika</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
 </head>
 
 <body>
@@ -64,22 +64,35 @@
       </form>
       </div>
     </main>
-  
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
-  
     <script>
-        document.addEventListener('DOMContentLoaded', function()   
-   {
+        document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',   
-  
-                locale: 'pl',
-                events: {{ events|safe }} // Przekaż dane z widoku
-            });
+        initialView: 'dayGridMonth',
+        timeZone: 'Europe/Warsaw',
+        events: {{ events|safe }},
+        eventDisplay: 'block',
+        eventContent: function(info) {
+            var eventTitle = info.event.title;
+            var eventElement = document.createElement('div');
+            var eventText = '<span>' + eventTitle + '</span><br>' + 
+                            '<span>' + info.event.start.toLocaleString() + '</span>';
+            
+            // Przykład zmiany koloru tła w zależności od tytułu
+            if (eventTitle === 'Podlewanie') {
+                eventElement.style.backgroundColor = '#4CAF50';  // Zielony dla "Podlewanie"
+            } else {
+                eventElement.style.backgroundColor = '#FF5733';  // Czerwony dla innych wydarzeń
+            }
+
+            eventElement.innerHTML = eventText;
+            return { html: eventElement.outerHTML };
+        }
+    });
             calendar.render();
         });
     </script>
+  
   </body>
   
   </html>

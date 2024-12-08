@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from . import models
+from . import utils
 from django.utils.dateparse import parse_datetime
 from django.contrib import admin
 import requests
@@ -63,43 +64,53 @@ def schedule_view(request):
     'end': event.end.isoformat()
     } for event in events]
 
+    print(f"Events_debug{events_json}")
+
     return render(request, 'schedule_page.html', {'events': events_json})
 
-# Funkcja do pobierania danych o pogodzie
-def get_weather_data(city):
-    # Użyj swojego klucza API, który otrzymałeś z OpenWeatherMap
-    api_key = settings.OPENWEATHER_API_KEY
-    base_url = "http://api.openweathermap.org/data/2.5/weather?"
-    
-    # Tworzenie pełnego URL z nazwą miasta i kluczem API
-    url = f"{base_url}q={city}&appid={api_key}&units=metric&lang=pl"
+def settings_view(request):
+    try:
+        settings = utils.load_settings()
+    except FileNotFoundError:
+        return render(
+            request,
+            "error.html",
+            {"message": "Plik ustawień nie został znaleziony. Skontaktuj się z administratorem."},
+        )
+    except ValueError:
+        return render(
+            request,
+            "error.html",
+            {"message": "Plik ustawień jest uszkodzony. Skontaktuj się z administratorem."},
+        )
 
-    # Wykonaj zapytanie GET do API
-    response = requests.get(url)
-    
-    # Jeśli odpowiedź jest poprawna (status 200)
-    if response.status_code == 200:
-        data = response.json()
-        
-        # Wydobywanie interesujących danych z odpowiedzi
-        weather = {
-            'city': data['name'],
-            'temperature': data['main']['temp'],
-            'description': data['weather'][0]['description'],
-            'humidity': data['main']['humidity'],
-            'wind_speed': data['wind']['speed'],
-            'rain': data.get('rain', {}).get('1h', 0)
-        }
-        
-        return weather
-    else:
-        # Jeśli wystąpił błąd (np. złe miasto)
-        return None
+    if request.method == "POST":
+        try:
+            # Aktualizacja ustawień z formularza
+            settings["pump_efficiency"] = float(request.POST.get("pump_efficiency", settings["pump_efficiency"]))
+            settings["city"] = request.POST.get("city", settings["city"])
+            settings["watering_duration"] = int(request.POST.get("watering_duration", settings["watering_duration"]))
+            settings["min_rain"] = float(request.POST.get("min_rain", settings.get("min_rain", 0)))
+            settings["disable_on_rain"] = request.POST.get("disable_on_rain", "false") == "true"
+            settings["max_temp"] = float(request.POST.get("max_temp", settings.get("max_temp", 35)))
+            settings["OPENWEATHER_API_KEY"] = request.POST.get("openweather_api_key", settings["OPENWEATHER_API_KEY"])
+
+            # Zapis ustawień
+            utils.save_settings(settings)
+            return redirect("settings")
+        except (ValueError, TypeError) as e:
+            # Jeśli coś poszło nie tak, zwróć błąd na stronie
+            return render(
+                request,
+                "error.html",
+                {"message": f"Niepoprawne dane w formularzu: {e}. Sprawdź i spróbuj ponownie."},
+            )
+
+    return render(request, "settings_page.html", {"settings": settings})
 
 
 def weather_view(request):
-    city = 'Poznan'
-    weather_data = get_weather_data(city)
+    weather_data = utils.get_weather_data()
     
     return render(request, 'weather_page.html', {'weather': weather_data})
 

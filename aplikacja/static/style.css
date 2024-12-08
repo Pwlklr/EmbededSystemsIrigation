@@ -90,72 +90,6 @@ nav a:hover {
     background-color: #218838;
 }
 
-/* Formularz kalendarza */
-
-/* Kalendarz */
-#calendar {
-    max-width: 50%;
-    margin: 20px auto;
-    padding: 10px;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Formularz */
-.schedule-form {
-    max-width: 600px;
-    margin: 20px auto;
-    text-align: left;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.schedule-form h2 {
-    margin-bottom: 15px;
-    color: #28a745;
-}
-
-.schedule-form label {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
-}
-
-.schedule-form input, .schedule-form button {
-    display: block;
-    width: 100%;
-    margin-top: 5px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-}
-
-.schedule-form button {
-    background-color: #28a745;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-}
-
-.schedule-form button:hover {
-    background-color: #218838;
-}
-
-.schedule-form select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-  }
-
 /* Sekcja pogody */
 .weather-container table {
     width: 80%; /* Dostosuj szerokość tabeli */
@@ -184,7 +118,143 @@ nav a:hover {
     background-color: #e6f7ff;
 }
   
-  /* Formularz kalendarza (Usuwanie zbędnych stylów) */
-  #calendar, .schedule-form { /* Remove unused styles */
-    display: none;
-  }
+/* Formularz i kalendarz */
+.schedule-form {
+    max-width: 600px;
+    margin: 25px auto;
+    text-align: left;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-form h2 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: #4CAF50;
+    text-align: center;
+}
+
+.schedule-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.schedule-form input,
+.schedule-form select {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.schedule-form input:focus,
+.schedule-form select:focus {
+    border-color: #4CAF50;
+    outline: none;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+.schedule-form button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.schedule-form button:hover {
+    background-color: #367c39;
+}
+
+#calendar {
+    max-width: 900px;
+    margin: 20px auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.fc-event {
+    background-color: #4CAF50;
+    border-color: #367c39;
+    color: white;
+}
+
+/* Opcjonalnie: Zmiana koloru tła na hover */
+.fc-event:hover {
+    background-color: #367c39; /* Ciemniejszy zielony przy najechaniu */
+    border-color: #2e6d32;
+}
+
+/* Formularz ustawień */
+.settings-form {
+    max-width: 600px;
+    margin: 20px auto;
+    text-align: left;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.settings-form h1 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: #28a745;
+    text-align: center;
+}
+
+.settings-form .form-group {
+    margin-bottom: 15px;
+}
+
+.settings-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.settings-form input,
+.settings-form select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.settings-form input:focus,
+.settings-form select:focus {
+    border-color: #28a745;
+    outline: none;
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+}
+
+.settings-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.settings-form button:hover {
+    background-color: #218838;
+}
