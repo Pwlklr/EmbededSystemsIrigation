@@ -26,6 +26,7 @@ urlpatterns = [
     path('weather/', views.weather_view, name='weather'),
     path('sensor/', views.sensor_view, name='sensor'),
     path('delete_events/', views.delete_events, name='delete_events'),
+    path('settings/', views.settings_view, name='settings'),
     path('test/', views.test_view, name='test'),
     
 ]

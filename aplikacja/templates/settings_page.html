@@ -1,0 +1,57 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ustawienia</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <main>
+        <h1>Ustawienia</h1>
+        <form class="settings-form" method="POST" action="/settings/">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="city">Miasto:</label>
+                <input type="text" id="city" name="city" value="{{ settings.city }}" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="pump_efficiency">Wydajność pompy (l/min):</label>
+                <input type="number" id="pump_efficiency" name="pump_efficiency" value="{{ settings.pump_efficiency }}" step="0.1" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="min_rain">Minimalny opad w ciągu ostatniej godziny, żeby wyłączyć podlewania (mm):</label>
+                <input type="number" id="min_rain" name="min_rain" value="{{ settings.min_rain }}" step="0.1" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="disable_on_rain">Czy wyłączać podlewanie, jeśli aktualnie pada?</label>
+                <select id="disable_on_rain" name="disable_on_rain">
+                    <option value="true" {% if settings.disable_on_rain %}selected{% endif %}>Tak</option>
+                    <option value="false" {% if not settings.disable_on_rain %}selected{% endif %}>Nie</option>
+                </select>
+            </div>
+    
+            <div class="form-group">
+                <label for="max_temp">Maksymalna temperatura przy podlewaniu (°C):</label>
+                <input type="number" id="max_temp" name="max_temp" value="{{ settings.max_temp }}" step="0.1" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="openweather_api_key">Klucz API OpenWeather:</label>
+                <input type="text" id="openweather_api_key" name="openweather_api_key" value="{{ settings.OPENWEATHER_API_KEY }}" required>
+            </div>
+    
+            <button type="submit" class="button">Zapisz ustawienia</button>
+        </form>
+    </main>
+</body>
+
+</html>
