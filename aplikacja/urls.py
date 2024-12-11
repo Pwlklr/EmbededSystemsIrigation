@@ -27,6 +27,7 @@ urlpatterns = [
     path('sensor/', views.sensor_view, name='sensor'),
     path('delete_events/', views.delete_events, name='delete_events'),
     path('settings/', views.settings_view, name='settings'),
+    path('statistics/', views.statistics_view, name='statistics'),
     path('test/', views.test_view, name='test'),
     
 ]
