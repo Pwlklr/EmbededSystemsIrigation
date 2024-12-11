@@ -89,7 +89,7 @@
             // Dane dzienne
             const dailyStats = {{ daily_stats|safe }};
             const dailyLabels = dailyStats.map(stat => stat.day);
-            const dailyDurations = dailyStats.map(stat => stat.duration);
+            const dailyDurations = dailyStats.map(stat => stat.duration * 60);
 
             const dailyCtx = document.getElementById('dailyChart').getContext('2d');
             new Chart(dailyCtx, {
@@ -97,7 +97,7 @@
                 data: {
                     labels: dailyLabels,
                     datasets: [{
-                        label: 'Czas podlewania (h)',
+                        label: 'Czas podlewania (min)',
                         data: dailyDurations,
                         backgroundColor: 'rgba(40, 167, 69, 0.6)',
                         borderColor: 'rgba(40, 167, 69, 1)',
@@ -117,7 +117,7 @@
             // Dane miesięczne
             const monthlyStats = {{ monthly_stats|safe }};
             const monthlyLabels = monthlyStats.map(stat => stat.month);
-            const monthlyDurations = monthlyStats.map(stat => stat.duration);
+            const monthlyDurations = monthlyStats.map(stat => stat.duration * 60);
 
             const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
             new Chart(monthlyCtx, {
@@ -125,7 +125,7 @@
                 data: {
                     labels: monthlyLabels,
                     datasets: [{
-                        label: 'Czas podlewania (h)',
+                        label: 'Czas podlewania (min)',
                         data: monthlyDurations,
                         backgroundColor: 'rgba(40, 167, 69, 0.6)',
                         borderColor: 'rgba(40, 167, 69, 1)',

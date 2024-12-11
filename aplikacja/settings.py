@@ -27,7 +27,7 @@ OPENWEATHER_API_KEY = '0997b2b7c7c9e26d36342fae2dd463a8'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
