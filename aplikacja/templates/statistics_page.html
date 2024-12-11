@@ -1,0 +1,147 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarządzanie irygacją trawnika</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="statistics-page">
+    {% include 'header.html' %}
+
+    <main>
+        <h1>Statystyki Podlewania</h1>
+        
+        <div class="charts-container">
+            <div class="chart-wrapper">
+                <h2>Czas Podlewania w Bieżącym Miesiącu</h2>
+                <canvas id="dailyChart"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <h2>Czas Podlewania w Bieżącym Roku</h2>
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </div>
+
+         <!-- Tabela ze statystykami -->
+          <br>
+          <br>
+         <h2>Podsumowanie Podlewań</h2>
+         <div class="tables-container">
+             <div class="table-wrapper">
+                 <h3>Wydarzenia w Bieżącym Miesiącu</h3>
+                 <table>
+                     <thead>
+                         <tr>
+                             <th>Status</th>
+                             <th>Liczba Wydarzeń</th>
+                         </tr>
+                     </thead>
+                     <tbody>
+                         <tr>
+                             <td>Planowe</td>
+                             <td>{{ monthly_status.planned }}</td>
+                         </tr>
+                         <tr>
+                             <td>Odwołane</td>
+                             <td>{{ monthly_status.canceled }}</td>
+                         </tr>
+                         <tr>
+                             <td>Dodatkowe</td>
+                             <td>{{ monthly_status.extra }}</td>
+                         </tr>
+                     </tbody>
+                 </table>
+             </div>
+             <div class="table-wrapper">
+                 <h3>Wydarzenia w Bieżącym Roku</h3>
+                 <table>
+                     <thead>
+                         <tr>
+                             <th>Status</th>
+                             <th>Liczba Wydarzeń</th>
+                         </tr>
+                     </thead>
+                     <tbody>
+                         <tr>
+                             <td>Planowe</td>
+                             <td>{{ yearly_status.planned }}</td>
+                         </tr>
+                         <tr>
+                             <td>Odwołane</td>
+                             <td>{{ yearly_status.canceled }}</td>
+                         </tr>
+                         <tr>
+                             <td>Dodatkowe</td>
+                             <td>{{ yearly_status.extra }}</td>
+                         </tr>
+                     </tbody>
+                 </table>
+             </div>
+         </div>
+
+        <script>
+            // Dane dzienne
+            const dailyStats = {{ daily_stats|safe }};
+            const dailyLabels = dailyStats.map(stat => stat.day);
+            const dailyDurations = dailyStats.map(stat => stat.duration);
+
+            const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+            new Chart(dailyCtx, {
+                type: 'bar',
+                data: {
+                    labels: dailyLabels,
+                    datasets: [{
+                        label: 'Czas podlewania (h)',
+                        data: dailyDurations,
+                        backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Dane miesięczne
+            const monthlyStats = {{ monthly_stats|safe }};
+            const monthlyLabels = monthlyStats.map(stat => stat.month);
+            const monthlyDurations = monthlyStats.map(stat => stat.duration);
+
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+            new Chart(monthlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: monthlyLabels,
+                    datasets: [{
+                        label: 'Czas podlewania (h)',
+                        data: monthlyDurations,
+                        backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        </script>
+    </main>
+</body>
+</html>

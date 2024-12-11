@@ -1,6 +1,6 @@
 {
     "pump_efficiency": 10.0,
-    "city": "Warszawa",
+    "city": "Poznan",
     "watering_duration": 15,
     "min_rain": 2.0,
     "disable_on_rain": true,

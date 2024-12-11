@@ -92,8 +92,8 @@ nav a:hover {
 
 /* Sekcja pogody */
 .weather-container table {
-    width: 80%; /* Dostosuj szerokość tabeli */
-    margin: 0 auto; /* Wyśrodkowanie tabeli */
+    width: 50%;
+    margin: 0 auto;
     border-collapse: collapse;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -257,4 +257,105 @@ nav a:hover {
 
 .settings-form button:hover {
     background-color: #218838;
+}
+
+/* Kontener dla wykresów */
+.charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Wrapper wykresów */
+.chart-wrapper {
+    flex: 1 1 calc(50% - 20px); /* Wykresy zajmują po pół szerokości */
+    max-width: 900px;           
+    text-align: center;
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Dostosowanie wielkości wykresów */
+#dailyChart, #monthlyChart {
+    width: 100% !important;
+    height: 500px !important; 
+}
+
+/* Dla responsywności */
+@media (max-width: 768px) {
+    .charts-container {
+        flex-direction: column;
+    }
+
+    .chart-wrapper {
+        max-width: 100%;
+    }
+
+    #dailyChart, #monthlyChart {
+        height: 400px !important;
+    }
+}
+
+/* Tabele */
+.tables-container {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.table-wrapper {
+    flex: 1 1 calc(50% - 20px);
+    max-width: 600px;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow-x: auto; /* Dodano przewijanie poziome */
+}
+
+/* Styl tabeli */
+table {
+    width: 100%; /* Szerokość tabeli dostosowana do kontenera */
+    border-collapse: collapse;
+    margin-top: 10px;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: center; /* Wyrównanie tekstu do środka */
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Responsywność dla tabeli - przewijanie poziome */
+@media (max-width: 768px) {
+    table {
+        width: 100%;
+        display: block;
+        overflow-x: auto;
+    }
+
+    th, td {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
 }

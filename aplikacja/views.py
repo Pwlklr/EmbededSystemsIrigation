@@ -3,15 +3,77 @@ from . import models
 from . import utils
 from django.utils.dateparse import parse_datetime
 from django.contrib import admin
+from django.db.models import Sum, Count, F
 import requests
 from django.conf import settings
 import datetime
+import calendar
 
 def test_view(request):
     return render(request, 'test_page.html', {'message': 'To jest przykładowa strona testowa!'})
 
 def home_view(request):
     return render(request, 'home_page.html')
+
+def statistics_view(request):
+    today = datetime.date.today()
+    current_month = today.month
+    current_year = today.year
+
+    # Wydarzenia dla bieżącego miesiąca
+    monthly_events = models.ScheduleEvent.objects.filter(start__month=current_month, start__year=current_year)
+
+    # Wydarzenia dla bieżącego roku
+    yearly_events = models.ScheduleEvent.objects.filter(start__year=current_year)
+
+    # Zliczamy liczbę planowych, odwołanych i dodatkowych wydarzeń w bieżącym miesiącu i roku
+    monthly_status_count = monthly_events.values('status').annotate(count=Count('status'))
+    yearly_status_count = yearly_events.values('status').annotate(count=Count('status'))
+
+    # Przygotowanie danych dziennych (bieżący miesiąc)
+    days_in_month = calendar.monthrange(current_year, current_month)[1]
+    daily_stats = []
+    for day in range(1, days_in_month + 1):
+        day_start = datetime.datetime(current_year, current_month, day)
+        day_end = day_start + datetime.timedelta(days=1)
+        daily_events = monthly_events.filter(start__gte=day_start, start__lt=day_end)
+        duration = daily_events.aggregate(total_time=Sum(F('end') - F('start')))['total_time']
+        daily_stats.append({
+            'day': day,
+            'duration': duration.total_seconds() / 3600 if duration else 0  # czas w godzinach
+        })
+
+    # Przygotowanie danych miesięcznych (bieżący rok)
+    monthly_stats = []
+    for month in range(1, 13):
+        month_events = yearly_events.filter(start__month=month)
+        duration = month_events.aggregate(total_time=Sum(F('end') - F('start')))['total_time']
+        monthly_stats.append({
+            'month': month,
+            'duration': duration.total_seconds() / 3600 if duration else 0  # czas w godzinach
+        })
+
+    # Przekształcenie wyników liczenia statusów na słownik
+    monthly_status_dict = {status['status']: status['count'] for status in monthly_status_count}
+    yearly_status_dict = {status['status']: status['count'] for status in yearly_status_count}
+
+    # Dodanie brakujących statusów w przypadku, gdy nie ma takich wydarzeń
+    for status in ['planned', 'canceled', 'extra']:
+        if status not in monthly_status_dict:
+            monthly_status_dict[status] = 0
+        if status not in yearly_status_dict:
+            yearly_status_dict[status] = 0
+
+    context = {
+        'daily_stats': daily_stats,
+        'monthly_stats': monthly_stats,
+        'monthly_status': monthly_status_dict,  # Ilosc odwolanych odbytych i dodatkowych podlewan w miesiacu
+        'yearly_status': yearly_status_dict,    # Ilosc odwolanych odbytych i dodatkowych podlewan w roku
+        'current_month': current_month,
+        'current_year': current_year,
+    }
+    return render(request, 'statistics_page.html', context)
+
 
 def delete_events(request):
     if request.method == 'POST':
