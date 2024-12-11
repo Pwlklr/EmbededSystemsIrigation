@@ -126,7 +126,7 @@ def schedule_view(request):
     'end': event.end.isoformat()
     } for event in events]
 
-    print(f"Events_debug{events_json}")
+    # print(f"Events_debug{events_json}")
 
     return render(request, 'schedule_page.html', {'events': events_json})
 

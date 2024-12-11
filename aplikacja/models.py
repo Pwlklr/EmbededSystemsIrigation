@@ -2,7 +2,7 @@ from django.db import models
 
 class ScheduleEvent(models.Model):
     STATUS_CHOICES = [
-        ('planned', 'Planowe'),
+        ('planned', 'Planowane'),
         ('canceled', 'Odwołane'),
         ('extra', 'Dodatkowe'),
     ]
