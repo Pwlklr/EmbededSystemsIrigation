@@ -25,7 +25,7 @@ def measure_parameters():
         
         # Logowanie
         print(f"[{datetime.now()}] Wilgotność: {humidity}% - Sprawdzono")
-
+        watering()
         # Odczekaj 60 sekund przed kolejnym odczytem
         time.sleep(60)
 
