@@ -3,17 +3,12 @@
 import os
 import sys
 import threading
-from wateringControl import measure_parameters
 
-def start_background_thread():
-    thread = threading.Thread(target=measure_parameters, daemon=True)
-    thread.start()
     
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'aplikacja.settings')
     
-    start_background_thread()
 
     try:
         from django.core.management import execute_from_command_line

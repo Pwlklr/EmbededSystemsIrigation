@@ -5,7 +5,6 @@ from datetime import timedelta
 #Nie dziala na kali linuxie do przetestowania z raspberry 
 #import RPi.GPIO as GPIO  # Import GPIO for Raspberry Pi (replace if using other hardware)
 #ALTERNATYWNE DO TESTOWANIA
-from gpiozero import LED
 
 # Konfiguracja GPIO -> przy powroce do RPi.GPIO USUNAC LED() -> 17
 WATER_PIN = LED(17)  # GPIO pin controlling the water pump or valve
@@ -17,10 +16,8 @@ WATER_PIN = LED(17)  # GPIO pin controlling the water pump or valve
 
 def measure_parameters():
     while True:
-        # Symulacja odczytu danych z sensorów
         humidity = get_humidity()
         
-        # Aktualizacja danych w bazie danych (przykładowo kalendarza)
         update_watering_schedule(humidity)
         
         # Logowanie
