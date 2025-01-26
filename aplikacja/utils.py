@@ -2,9 +2,16 @@ import requests
 from django.conf import settings
 import json
 import os
+import adafruit_dht
+import board
+import time
+import serial
 
 # Ścieżka do pliku ustawień
 SETTINGS_FILE = os.path.join(os.path.dirname(__file__), "settings.json")
+
+sensor = adafruit_dht.DHT11(board.D17)
+
 
 # Funkcja do pobierania danych o pogodzie
 def get_weather_data():
@@ -57,3 +64,34 @@ def save_settings(settings):
     """Zapisuje ustawienia do pliku settings.json."""
     with open(SETTINGS_FILE, "w") as file:
         json.dump(settings, file, indent=4)
+
+def getTemperature():
+    # Ustawienie typu czujnika (DHT11) i pinu GPIO (GPIO 17)
+
+    temperature_c = sensor.temperature
+    humidity = sensor.humidity
+
+    if humidity is not None and temperature_c is not None:
+        return temperature_c, humidity
+    else:
+        return "Error"
+
+
+def get_humidity():
+    # Otwórz port szeregowy, aby komunikować się z Arduino
+    arduino = serial.Serial('/dev/ttyUSB0', 9600)  # Ustaw odpowiedni port i prędkość (9600)
+    time.sleep(2)  # Poczekaj chwilę, aż Arduino się zainicjalizuje
+
+    while True:
+        # Sprawdź, czy dane są dostępne do odczytu
+        if arduino.in_waiting > 0:
+            # Odczytaj dane z portu szeregowego
+            data = arduino.readline().decode('utf-8').strip()
+
+            # Sprawdź, czy dane zawierają wilgotność
+            if "Wilgotność gleby:" in data:
+                # Odczytaj wilgotność
+                return data
+
+        time.sleep(1)  # Sprawdź co 1 sekundę
+

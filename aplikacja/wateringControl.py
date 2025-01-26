@@ -1,52 +1,110 @@
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.utils.timezone import now
-from datetime import timedelta
-#Nie dziala na kali linuxie do przetestowania z raspberry 
-#import RPi.GPIO as GPIO  # Import GPIO for Raspberry Pi (replace if using other hardware)
-#ALTERNATYWNE DO TESTOWANIA
-from gpiozero import LED
+from . import utils
+import board
+import threading
+import json
+import os
+from digitalio import DigitalInOut, Direction
 
-# Konfiguracja GPIO -> przy powroce do RPi.GPIO USUNAC LED() -> 17
-WATER_PIN = LED(17)  # GPIO pin controlling the water pump or valve
+# Konfiguracja GPIO dla diody LED (symulacja pompy wody)
+water_pin = DigitalInOut(board.D27)  # Ustaw pin GPIO 27 jako wyjście
+water_pin.direction = Direction.OUTPUT
+water_pin.value = False  # Ustaw LED jako wyłączony na starcie
+
+_thread_lock = threading.Lock()
+_thread_started = False
+
+JSON_FILE_PATH = os.path.join(os.path.dirname(__file__), "sensors.json")
 
 
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setup(WATER_PIN, GPIO.OUT)
-# GPIO.output(WATER_PIN, GPIO.LOW)  # Upewnij się, że pompa jest wyłączona na początku
 
 def measure_parameters():
-    while True:
-        # Symulacja odczytu danych z sensorów
-        humidity = get_humidity()
-        
-        # Aktualizacja danych w bazie danych (przykładowo kalendarza)
-        update_watering_schedule(humidity)
-        
-        # Logowanie
-        print(f"[{datetime.now()}] Wilgotność: {humidity}% - Sprawdzono")
-        watering()
-        # Odczekaj 60 sekund przed kolejnym odczytem
-        time.sleep(60)
+    """
+    Funkcja uruchamiana w osobnym wątku, która monitoruje wilgotność i steruje podlewaniem.
+    """
 
-def get_humidity():
-    # Przykład odczytu z sensora (zastąp odpowiednim kodem)
-    return 40  # Zwróć procentową wilgotność
+    time.sleep(5)
+
+    global _thread_started
+
+    with _thread_lock:
+        if _thread_started:
+            return
+        _thread_started = True
+        print("The thread has started!")
+    while True:
+        try:
+            # Odczyt wilgotności gleby i powietrza
+            humidity = utils.get_humidity()
+            temp, air_humidity = utils.getTemperature()
+
+            
+
+            humidity = float(humidity.split(":")[-1].strip().replace(" %", ""))
+
+                # Przygotowanie danych do zapisania
+            sensor_data = {
+                'temperature': temp,
+                'air_moisture': air_humidity,
+                'ground_moisture': humidity
+            }
+
+            # Zapisanie danych do pliku JSON
+            with open(JSON_FILE_PATH, 'w') as json_file:
+                json.dump(sensor_data, json_file)
+
+
+            # Aktualizacja harmonogramu podlewania
+            update_watering_schedule(humidity)
+
+            # Logowanie odczytów
+            print(f"[{datetime.now()}] Wilgotność gleby: {humidity}%")
+            print(f"Temperatura: {temp:.1f}°C, Wilgotność powietrza: {air_humidity:.1f}%")
+
+            # Wykonaj podlewanie, jeśli jest zaplanowane
+            watering()
+
+            # Opóźnienie między cyklami (60 sekund)
+            time.sleep(60)
+
+        except Exception as e:
+            print(f"Błąd w measure_parameters: {e}")
+            time.sleep(10)  # Odczekaj chwilę przed kolejną próbą
+
 
 def update_watering_schedule(humidity):
-    from aplikacja.models import ScheduleEvent  # Załaduj model Django
-    if humidity < 30:
-        print("Wilgotność niska, dodaj wydarzenie podlewania.")
-        # Dodaj logikę modyfikującą kalendarz
+    """
+    Aktualizuje harmonogram podlewania na podstawie wilgotności gleby.
+    """
+
+    from .models import ScheduleEvent
+    from .utils import load_settings, get_weather_data
+
+
+    weather = get_weather_data()
+    settings = load_settings()
+    rain = int(weather["rain"])
+    temp = float(weather["temperature"])
+
+    try:
+        humidity = float(humidity)  # Rzutowanie na float, jeśli to string
+    except ValueError:
+        print(f"Niepoprawna wartość wilgotności: {humidity}")
+        return
+
+
+    if humidity < int(settings["pump_efficiency"]) and not rain:
+        print("Wilgotność gleby niska. Dodawanie wydarzenia podlewania.")
         ScheduleEvent.objects.create(
             title="Podlewanie",
             start=now(),
             end=now() + timedelta(seconds=30),
             status="extra"
         )
-    elif humidity > 70:
-        print("Wilgotność wysoka, anulowanie podlewania.")
-        # Zmień istniejące wydarzenia
+    elif humidity > 80 or (settings["disable_on_rain"] and rain >= settings["min_rain"]) or temp > settings["max_temp"]:
+        print("Anulowanie wydarzeń podlewania.")
         ongoing_event = ScheduleEvent.objects.filter(
             start__lte=now(),
             end__gte=now(),
@@ -57,12 +115,17 @@ def update_watering_schedule(humidity):
             ongoing_event.save()
             print(f"Anulowano wydarzenie: {ongoing_event.title}")
         else:
-            print("Brak zaplanowanego wydarzenia do anulowania.")
+            print("Brak wydarzeń do anulowania.")
+
 
 def watering():
-    #watering if scheduled or too dry
-    from aplikacja.models import ScheduleEvent
-    # Pobierz wydarzenia podlewania zaplanowane na teraz
+    """
+    Uruchamia podlewanie, jeśli jest zaplanowane w harmonogramie.
+    Czas podlewania jest określany jako różnica między 'end' a 'start'.
+    """
+
+    from .models import ScheduleEvent
+
     ongoing_events = ScheduleEvent.objects.filter(
         start__lte=now(),
         end__gte=now(),
@@ -70,20 +133,29 @@ def watering():
     )
 
     if ongoing_events.exists():
-        print("Podlewanie rozpoczęte.")
-        start_watering()
-        time.sleep(30)  # Czas trwania podlewania w sekundach
-        stop_watering()
-        print("Podlewanie zakończone.")
+        for event in ongoing_events:
+            duration = (event.end - event.start).total_seconds()  # Czas trwania w sekundach
+            
+            print(f"Podlewanie rozpoczęte dla wydarzenia: {event.title} (czas trwania: {duration} sekund).")
+            start_watering()
+            time.sleep(duration)  # Podlewanie przez czas trwania wydarzenia
+            stop_watering()
+            print(f"Podlewanie zakończone dla wydarzenia: {event.title}.")
     else:
         print("Brak zaplanowanego podlewania.")
 
+
 def start_watering():
-    """Symulacja włączenia pompy wody."""
-    WATER_PIN.on()
+    """
+    Symulacja włączenia pompy wody (dioda LED).
+    """
+    water_pin.value = True  # Włącz LED
     print("Pompa wody WŁĄCZONA.")
 
+
 def stop_watering():
-    """Symulacja wyłączenia pompy wody."""
-    WATER_PIN.off()
+    """
+    Symulacja wyłączenia pompy wody (dioda LED).
+    """
+    water_pin.value = False  # Wyłącz LED
     print("Pompa wody WYŁĄCZONA.")
