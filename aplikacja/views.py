@@ -8,9 +8,22 @@ import requests
 from django.conf import settings
 import datetime
 import calendar
+import threading
+import os
+import json
+# from wateringControl import measure_parameters
+
+JSON_FILE_PATH = os.path.join(os.path.dirname(__file__), "sensors.json")
+
+
+# def start_background_thread():
+#     thread = threading.Thread(target=measure_parameters, daemon=True)
+#     thread.start()
 
 def test_view(request):
     return render(request, 'test_page.html', {'message': 'To jest przykładowa strona testowa!'})
+
+
 
 def home_view(request):
     return render(request, 'home_page.html')
@@ -176,5 +189,21 @@ def weather_view(request):
     
     return render(request, 'weather_page.html', {'weather': weather_data})
 
+
 def sensor_view(request):
-    return render(request, 'sensor_page.html')
+    # Odczytanie danych z pliku JSON
+    try:
+        with open(JSON_FILE_PATH, 'r') as json_file:
+            sensor_data = json.load(json_file)
+
+        temperature = sensor_data.get('temperature')
+        air_moisture = sensor_data.get('air_moisture')
+        ground_moisture = sensor_data.get('ground_moisture')
+
+    except FileNotFoundError:
+        # Jeśli plik nie istnieje, można ustawić domyślne wartości
+        temperature = 'Brak danych'
+        air_moisture = 'Brak danych'
+        ground_moisture = 'Brak danych'
+
+    return render(request, 'sensor_page.html', {'temperature': temperature, 'air_moisture': air_moisture, 'ground_moisture': ground_moisture})

@@ -14,7 +14,28 @@
 <body>
     {% include 'header.html' %}
     <main>
-        
+        <h1>Odczyt z czujników</h1>
+        <br>
+        <div class="weather-container">
+                <table>
+                    <tr>
+                        <th>Parametr</th>
+                        <th>Wartość</th>
+                    </tr>
+                    <tr>
+                        <td>Temperatura powietrza</td>
+                        <td>{{ temperature }} °C</td>
+                    </tr>
+                    <tr>
+                        <td>Wilgotność powietrza</td>
+                        <td>{{ air_moisture }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Wilgotność gleby</td>
+                        <td>{{ ground_moisture }}%</td>
+                    </tr>
+                </table>
+        </div>
     </main>
 </body>
 </html>
