@@ -1,9 +1,23 @@
-# Opis projektu
-Projekt ma na celu stworzenie aplikacji internetowej do zarządzania systemem automatycznego podlewania trawnika. Aplikacja umożliwia:
+## Opis projektu
 
-- Zarządzanie harmonogramem irygacji: Tworzenie i edytowanie grafiku podlewania za pomocą kalendarza.
-- Integracja z prognozami pogody: System automatycznie dostosowuje harmonogram podlewania do aktualnych warunków pogodowych (np. deszcz, wysoka temperatura).
-- Integracja z czujnikami wilgotności i temperatury: Monitorowanie stanu gleby i temperatury, aby zapobiec nadmiernemu podlewaniu lub umożliwić podlewanie w optymalnych warunkach.
-- System bazuje na aplikacji Django, która pozwala użytkownikom tworzyć, edytować oraz usuwać wydarzenia dotyczące podlewania, a także na integracji z zewnętrznymi API pogodowymi i czujnikami w czasie rzeczywistym.
+Aplikacja webowa do zarządzania automatycznym systemem podlewania trawnika.  
+Główne funkcje:
 
-Aplikacja stworzona została, aby funkcjonowała na Raspberry PI wraz z czujnikami temperatury i wilgotności powietrza i gleby 
+- **Harmonogram irygacji** – tworzenie i edycja planów podlewania w kalendarzu,
+- **Integracja z prognozą pogody** – system dostosowuje podlewanie do warunków (opady, upały),
+- **Integracja z czujnikami** – analiza wilgotności gleby i temperatury, by dostosować podlewanie do rzeczywistych potrzeb,
+- **Platforma Django** – CRUD wydarzeń irygacyjnych, połączenie z API pogodowym i sensorami na żywo,
+- **Uruchamiane na Raspberry Pi** – sterownik sprzętowy do obsługi czujników i zaworów.
+
+Aplikacja pozwala sterować podlewaniem trawnika w sposób efektywny, niezależny od pogody i faktycznego stanu gleby.
+
+---
+
+## Technologie
+
+- **Backend:** Python 3 + Django
+- **Frontend:** HTML, CSS, JavaScript (z wykorzystaniem SSE lub AJAX)
+- **Baza danych:** SQLite (lub inna kompatybilna z Django)
+- **Raspberry Pi:** sterowanie GPIO czujnikami wilgotności i temperatury (DHT, czujniki gleby)
+- **Integracja pogodowa:** dowolne API pogodowe (np. OpenWeatherMap)
+- **Urządzenia:** zawory solenoidowe, czujniki wilgotności i temperatury, przekaźniki, ewentualny panel solarny
